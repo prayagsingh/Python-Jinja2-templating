@@ -1,0 +1,204 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+---
+Organizations:
+    - &OrdererOrg
+        Name: OrdererOrg
+        ID: OrdererMSP
+        MSPDir: crypto-config/ordererOrganizations/{{ FULL_DOMAIN }}/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Writers:
+                Type: Signature
+                Rule: "OR('OrdererMSP.member')"
+            Admins:
+                Type: Signature
+                Rule: "OR('OrdererMSP.admin')"
+
+    - &{{ ORG1_NAME_CAP }}
+        Name: {{ ORG1_NAME_CAP }} 
+        ID: {{ ORG1_NAME_CAP }}MSP
+        MSPDir: crypto-config/peerOrganizations/{{ ORG1_NAME }}.{{ FULL_DOMAIN }}/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('{{ ORG1_NAME_CAP }}MSP.admin', '{{ ORG1_NAME_CAP }}MSP.peer', '{{ ORG1_NAME_CAP }}MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('{{ ORG1_NAME_CAP }}MSP.admin', '{{ ORG1_NAME_CAP }}MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('{{ ORG1_NAME_CAP }}MSP.admin')"
+
+        AnchorPeers:
+            - Host: peer0.{{ ORG1_NAME }}.{{ FULL_DOMAIN }}
+              Port: 7051
+
+    - &Buyer
+        Name: Buyer
+        ID: BuyerMSP
+        MSPDir: crypto-config/peerOrganizations/{{ ORG2_NAME }}.{{ FULL_DOMAIN }}/msp
+
+        # Policies defines the set of policies at this level of the config tree
+        # For organization policies, their canonical path is usually
+        #   /Channel/<Application|Orderer>/<OrgName>/<PolicyName>
+        Policies:
+            Readers:
+                Type: Signature
+                Rule: "OR('{{ ORG2_NAME_CAP }}MSP.admin', '{{ ORG2_NAME_CAP }}MSP.peer', '{{ ORG2_NAME_CAP }}MSP.client')"
+            Writers:
+                Type: Signature
+                Rule: "OR('{{ ORG2_NAME_CAP }}MSP.admin', '{{ ORG2_NAME_CAP }}MSP.client')"
+            Admins:
+                Type: Signature
+                Rule: "OR('{{ ORG2_NAME_CAP }}MSP.admin')"
+
+        AnchorPeers:
+            - Host: peer0.{{ ORG2_NAME }}.{{ FULL_DOMAIN }}
+              Port: 9051
+
+Capabilities:
+    Channel: &ChannelCapabilities
+        V1_3: true
+    Orderer: &OrdererCapabilities
+        V1_1: true
+    Application: &ApplicationCapabilities
+        V1_3: true
+        V1_2: false
+        V1_1: false
+
+Application: &ApplicationDefaults
+
+    Organizations:
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    Capabilities:
+        <<: *ApplicationCapabilities
+
+Orderer: &OrdererDefaults
+    OrdererType: solo
+    Addresses:
+        - orderer.{{ FULL_DOMAIN }}:7050
+        
+    # Batch Timeout: The amount of time to wait before creating a batch
+    BatchTimeout: 2s
+
+    # Batch Size: Controls the number of messages batched into a block
+    BatchSize:
+
+        # Max Message Count: The maximum number of messages to permit in a batch
+        MaxMessageCount: 10
+
+        # Absolute Max Bytes: The absolute maximum number of bytes allowed for
+        # the serialized messages in a batch.
+        AbsoluteMaxBytes: 99 MB
+
+        # Preferred Max Bytes: The preferred maximum number of bytes allowed for
+        # the serialized messages in a batch. A message larger than the preferred
+        # max bytes will result in a batch larger than preferred max bytes.
+        PreferredMaxBytes: 512 KB
+
+    # Organizations is the list of orgs which are defined as participants on
+    # the orderer side of the network
+    Organizations:
+
+    # Policies defines the set of policies at this level of the config tree
+    # For Orderer policies, their canonical path is
+    #   /Channel/Orderer/<PolicyName>
+    Policies:
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+        # BlockValidation specifies what signatures must be included in the block
+        # from the orderer for the peer to validate it.
+        BlockValidation:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+
+Channel: &ChannelDefaults
+    # Policies defines the set of policies at this level of the config tree
+    # For Channel policies, their canonical path is
+    #   /Channel/<PolicyName>
+    Policies:
+        # Who may invoke the 'Deliver' API
+        Readers:
+            Type: ImplicitMeta
+            Rule: "ANY Readers"
+        # Who may invoke the 'Broadcast' API
+        Writers:
+            Type: ImplicitMeta
+            Rule: "ANY Writers"
+        # By default, who may modify elements at this config level
+        Admins:
+            Type: ImplicitMeta
+            Rule: "MAJORITY Admins"
+
+    # Capabilities describes the channel level capabilities, see the
+    # dedicated Capabilities section elsewhere in this file for a full
+    # description
+    Capabilities:
+        <<: *ChannelCapabilities
+
+################################################################################
+#
+#   Profile
+#
+#   - Different configuration profiles may be encoded here to be specified
+#   as parameters to the configtxgen tool
+#
+################################################################################
+Profiles:
+
+    {{ ORDERER_PROFILE }}:
+        <<: *ChannelDefaults
+        Orderer:
+            <<: *OrdererDefaults
+            Organizations:
+                - *OrdererOrg
+            Capabilities:
+                <<: *OrdererCapabilities
+        Consortiums:
+            SampleConsortium:
+                Organizations:
+                    - *{{ ORG1_NAME_CAP }}
+                    - *{{ ORG2_NAME_CAP }}
+    {{ CHANNEL_PROFILE }}:
+        Consortium: SampleConsortium
+        <<: *ChannelDefaults
+        Application:
+            <<: *ApplicationDefaults
+            Organizations:
+                - *{{ ORG1_NAME_CAP }}
+                - *{{ ORG2_NAME_CAP }}
+            Capabilities:
+                <<: *ApplicationCapabilities
+
+    

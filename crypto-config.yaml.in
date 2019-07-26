@@ -1,0 +1,27 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+OrdererOrgs:
+  - Name: Orderer
+    Domain: {{ FULL_DOMAIN }}
+    Specs:
+      - Hostname: orderer
+
+PeerOrgs:
+  - Name: {{ ORG1_NAME_CAP }}
+    Domain: {{ ORG1_COMP_DOMAIN }}
+    EnableNodeOUs: true
+    Template:
+      Count: {{ NUMER_OF_PEERS_ORG1 }}
+    Users:
+      Count: {{ NUMER_OF_USERS_ORG1 }}
+
+  - Name: {{ ORG2_NAME_CAP }}
+    Domain: {{ ORG2_COMP_DOMAIN }}
+    EnableNodeOUs: true
+    Template:
+      Count: {{ NUMER_OF_PEERS_ORG2 }}
+    Users:
+      Count: {{ NUMER_OF_USERS_ORG2 }}

@@ -1,0 +1,110 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+services:
+
+  orderer.{{ FULL_DOMAIN }}:
+    container_name: orderer.{{ FULL_DOMAIN }}
+    extends:
+      file: peer-base.yaml
+      service: orderer-base
+    volumes:
+        - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+        - ../crypto-config/ordererOrganizations/{{ FULL_DOMAIN }}/orderers/orderer.{{ FULL_DOMAIN }}/msp:/var/hyperledger/orderer/msp
+        - ../crypto-config/ordererOrganizations/{{ FULL_DOMAIN }}/orderers/orderer.{{ FULL_DOMAIN }}/tls/:/var/hyperledger/orderer/tls
+        - orderer.{{ FULL_DOMAIN }}:/var/hyperledger/production/orderer
+    ports:
+      - 7050:7050
+
+  peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:
+    container_name: peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}
+      - CORE_PEER_ADDRESS=peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:7051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:7051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:7052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:7052
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:8051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:7051
+      - CORE_PEER_LOCALMSPID={{  ORG1_NAME_CAP }}MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/{{  ORG1_NAME }}.{{ FULL_DOMAIN }}/peers/peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/{{  ORG1_NAME }}.{{ FULL_DOMAIN }}/peers/peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}/tls:/etc/hyperledger/fabric/tls
+        - peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:/var/hyperledger/production
+    ports:
+      - 7051:7051
+
+  peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:
+    container_name: peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}
+      - CORE_PEER_ADDRESS=peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:8051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:8051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:8052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:8052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:8051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:7051
+      - CORE_PEER_LOCALMSPID={{  ORG1_NAME_CAP }}MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/{{  ORG1_NAME }}.{{ FULL_DOMAIN }}/peers/peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/{{  ORG1_NAME }}.{{ FULL_DOMAIN }}/peers/peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}/tls:/etc/hyperledger/fabric/tls
+        - peer1.{{  ORG1_NAME }}.{{ FULL_DOMAIN }}:/var/hyperledger/production
+
+    ports:
+      - 8051:8051
+
+  peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:
+    container_name: peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}
+      - CORE_PEER_ADDRESS=peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:9051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:9051
+      - CORE_PEER_CHAINCODEADDRESS=peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:9052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:9052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:9051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:10051
+      - CORE_PEER_LOCALMSPID={{  ORG2_NAME_CAP }}MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/{{  ORG2_NAME }}.{{ FULL_DOMAIN }}/peers/peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/{{  ORG2_NAME }}.{{ FULL_DOMAIN }}/peers/peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}/tls:/etc/hyperledger/fabric/tls
+        - peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:/var/hyperledger/production
+    ports:
+      - 9051:9051
+
+  peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:
+    container_name: peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}
+    extends:
+      file: peer-base.yaml
+      service: peer-base
+    environment:
+      - CORE_PEER_ID=peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}
+      - CORE_PEER_ADDRESS=peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:10051
+      - CORE_PEER_LISTENADDRESS=0.0.0.0:10051
+      - CORE_PEER_CHAINCODEADDRESS=peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:10052
+      - CORE_PEER_CHAINCODELISTENADDRESS=0.0.0.0:10052
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:10051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:9051
+      - CORE_PEER_LOCALMSPID={{  ORG2_NAME_CAP }}MSP
+    volumes:
+        - /var/run/:/host/var/run/
+        - ../crypto-config/peerOrganizations/{{  ORG2_NAME }}.{{ FULL_DOMAIN }}/peers/peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}/msp:/etc/hyperledger/fabric/msp
+        - ../crypto-config/peerOrganizations/{{  ORG2_NAME }}.{{ FULL_DOMAIN }}/peers/peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}/tls:/etc/hyperledger/fabric/tls
+        - peer1.{{  ORG2_NAME }}.{{ FULL_DOMAIN }}:/var/hyperledger/production
+    ports:
+      - 10051:10051
