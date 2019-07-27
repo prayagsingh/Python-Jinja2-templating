@@ -32,7 +32,7 @@ setGlobals() {
   PEER=$1
   ORG=$2
   if [ $ORG -eq 1 ]; then
-    CORE_PEER_LOCALMSPID="{{ ORG1_NAME }}MSP"
+    CORE_PEER_LOCALMSPID="{{ ORG1_NAME_CAP }}MSP"
     CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG1_CA
     CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/{{ ORG1_NAME }}.{{ FULL_DOMAIN }}/users/Admin@{{ ORG1_NAME }}.{{ FULL_DOMAIN }}/msp
     if [ $PEER -eq 0 ]; then
@@ -41,7 +41,7 @@ setGlobals() {
       CORE_PEER_ADDRESS=peer1.{{ ORG1_NAME }}.{{ FULL_DOMAIN }}:8051
     fi
   elif [ $ORG -eq 2 ]; then
-    CORE_PEER_LOCALMSPID="{{ ORG2_NAME }}MSP"
+    CORE_PEER_LOCALMSPID="{{ ORG2_NAME_CAP }}MSP"
     CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG2_CA
     CORE_PEER_MSPCONFIGPATH=/opt/gopath/src/github.com/hyperledger/fabric/peer/crypto/peerOrganizations/{{ ORG2_NAME }}.{{ FULL_DOMAIN }}/users/Admin@{{ ORG2_NAME }}.{{ FULL_DOMAIN }}/msp
     if [ $PEER -eq 0 ]; then
