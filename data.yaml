@@ -1,4 +1,4 @@
-COMPOSE_PROJECT_NAME: "testscript"
+COMPOSE_PROJECT_NAME: testscript
 IMAGETAG: "1.4.1"
 ORDERER_PROFILE: "TwoOrgsOrdererGenesis"
 ORD_CHANNEL_ID: "myorderer"
@@ -7,7 +7,7 @@ CHANNEL_NAME: "mychannel"
 ORG1_NAME: "seller"
 ORG2_NAME: "buyer"
 DOMAIN: "mytrade"
-PROJECT_NAME: "testscript"
+PROJECT_NAME: testscript
 ORG1_NAME_CAP:         "Seller" 
 ORG2_NAME_CAP:       "Buyer"
 FULL_DOMAIN:         "mytrade.com"
