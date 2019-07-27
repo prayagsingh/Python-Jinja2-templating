@@ -3,6 +3,7 @@ IMAGETAG: "1.4.1"
 ORDERER_PROFILE: "TwoOrgsOrdererGenesis"
 ORD_CHANNEL_ID: "myorderer"
 CHANNEL_PROFILE: "TwoOrgsChannel"
+CHANNEL_NAME: "mychannel"
 ORG1_NAME: "seller"
 ORG2_NAME: "buyer"
 DOMAIN: "mytrade"
@@ -16,3 +17,5 @@ NUMER_OF_PEERS_ORG1: 2
 NUMER_OF_PEERS_ORG2: 2
 NUMER_OF_USERS_ORG1: 1
 NUMER_OF_USERS_ORG2: 1
+# Below variable is used in docker inspect command. Don't remove it.
+DOCK_CONFIG: "{{.Config.Volumes}}"
