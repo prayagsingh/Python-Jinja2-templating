@@ -10,12 +10,12 @@ config_data = yaml.safe_load(open('data.yaml'))
 #print("config_data value is: ", config_data)
 
 #Load Jinja2 template
-filesToBeParsed = ['crypto-config', 'configtx', 'docker-compose-base', 'docker-compose-e2e-template', 'script', 'utils']
+filesToBeParsed = ['crypto-config', 'configtx', 'docker-compose-base', 'docker-compose-e2e-template', 'script', 'utils', 'byfn']
 
 env = Environment(loader = FileSystemLoader('.'), trim_blocks=True, lstrip_blocks=True)
 for i in filesToBeParsed:
     print("\n\n ####### Reading file: ", i, " #########\n\n")
-    if "script" in i or "utils" in i:
+    if "script" in i or "utils" in i or 'byfn' in i:
         template = env.get_template(i + ".sh.in")
     else:            
         template = env.get_template(i + ".yaml.in")
@@ -31,6 +31,9 @@ for i in filesToBeParsed:
     elif "script" in i or "utils" in i:
         path = "../scripts/"
         extension = ".sh"    
+    elif 'byfn' in i:
+        path = "../"
+        extension = ".sh"        
     else:
         path = "../" 
            
