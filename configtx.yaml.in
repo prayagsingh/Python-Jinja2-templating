@@ -47,9 +47,9 @@ Organizations:
             - Host: peer0.{{ ORG1_NAME }}.{{ FULL_DOMAIN }}
               Port: 7051
 
-    - &Buyer
-        Name: Buyer
-        ID: BuyerMSP
+    - &{{ ORG2_NAME_CAP }}
+        Name: {{ ORG2_NAME_CAP }}
+        ID: {{ ORG2_NAME_CAP }}MSP
         MSPDir: crypto-config/peerOrganizations/{{ ORG2_NAME }}.{{ FULL_DOMAIN }}/msp
 
         # Policies defines the set of policies at this level of the config tree
